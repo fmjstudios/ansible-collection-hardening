@@ -1,0 +1,16 @@
+---
+download_dir: /tmp/downloads/maldet
+cron_job_minute: 0
+cron_job_hour: 12
+cron_job_command: "/usr/local/maldetect/maldet -b -r\
+  /home?/?/public_html/,/var/www/html/\
+  ,/usr/local/apache/htdocs/ 1 >> /dev/null 2>&1"
+#
+# ############################
+# EXAMPLE CONFIGURATION
+# ############################
+
+# download_dir: /tmp/downloads/maldet
+# cron_job_minute: 0
+# cron_job_hour: 12
+# cron_job_command: /usr/local/maldetect/maldet -b -r /home?/?/public_html/,/var/www/html/,/usr/local/apache/htdocs/ 1 >> /dev/null 2>&1

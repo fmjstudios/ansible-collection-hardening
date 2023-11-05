@@ -1,0 +1,39 @@
+#jinja2: lstrip_blocks: True
+
+# {{ ansible_managed }}
+# 'ufw' default initialization configuration file
+# /etc/default/ufw
+
+# ###########################
+# GENERAL CONFIGURATION
+# ###########################
+
+{% if ufw_enable_ipv6 %}
+IPV6=yes
+{% else %}
+IPV6=no
+{% endif %}
+
+DEFAULT_INPUT_POLICY="{{ ufw_default_input }}"
+DEFAULT_OUTPUT_POLICY="{{ ufw_default_output }}"
+DEFAULT_FORWARD_POLICY="{{ ufw_default_forward }}"
+DEFAULT_APPLICATION_POLICY="{{ ufw_default_application }}"
+
+{% if ufw_manage_builtins %}
+MANAGE_BUILTINS=yes
+{% else %}
+MANAGE_BUILTINS=no
+{% endif %}
+
+# ###########################
+# BACKEND CONFIGURATION
+# ###########################
+
+{% if 'iptables' == ufw_backend %}
+IPT_SYSCTL="{{ __ufw_iptables_sysctl_path }}"
+{% else %}
+#IPT_SYSCTL=
+{% endif %}
+
+IPT_SYSCTL=/etc/ufw/sysctl.conf
+IPT_MODULES="{{ ufw_ipt_modules | join(' ') }}"

@@ -1,0 +1,68 @@
+---
+# Whether or not to enable 'ufw' at boot - SSH rules should already be applied
+# at the time configuration for this
+ufw_enabled: true
+
+# Whether or not the 'ufw' installation will also manage IPv6 firewall chains. Can either be
+# 'yes' or 'no'
+ufw_enable_ipv6: true
+
+# Whether or not the Ansible role should disable other firewall clients which
+# might be installed/configured on the machine. This does not affect the 'iptables'
+# and 'ip6tables' command-line utilities but rather dedicated clients like 'firewalld'
+ufw_disable_other_clients: false
+
+# DEFAULT POLICIES
+#
+# The default policy values to use if none are specified
+ufw_default_input: DROP
+ufw_default_output: ACCEPT
+ufw_default_forward: DROP
+ufw_default_application: SKIP
+
+# The default loglevel to configure 'ufw' with - can be 'full', 'high', 'low',
+# 'medium', 'off', 'on'
+ufw_loglevel: low
+
+# Whether or not the 'ufw' installation will manage built-in iptables chains -
+# thereby breaking chains configured with other firewall clients like 'firewalld'
+# or directly with 'iptables'/'ip6tables'
+# Is enabled by default if other firewall clients are set to be disabled which
+# is DISABLED by default
+ufw_manage_builtins: "{{ true if ufw_disable_other_clients else false }}"
+
+# The backend to configure for 'ufw' to use - can either be 'iptables' or 'ntftables'
+ufw_backend: iptables
+
+# Extra netfilter tracking modules to be loaded by 'ufw'
+ufw_ipt_modules:
+  []
+  # - nf_conntrack_ftp
+  # - nf_conntrack_irc
+  # - ...
+
+# The actual firewall chains to configure
+ufw_chains:
+  - label: Deny all incoming traffic
+    policy: deny
+    interface: eth0
+  - label: Allow Ansible traffic
+    rule: allow
+    ports: "{{ ansible_remote_port }}"
+    protocol: tcp
+  - label: Allow web server traffic
+    rule: allow
+    ports:
+      - 80
+      - 443
+    protocol:
+      - tcp
+    interface: eth0
+# - label: Allow traffic from work machine
+#   rule: allow
+#   protocol: any
+#   port: 8080
+#   from:
+#     - 147.78.126.74/32
+#   route: true
+#   interface: eth1

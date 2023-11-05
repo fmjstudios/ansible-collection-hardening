@@ -1,0 +1,12 @@
+#jinja2: lstrip_blocks: True
+
+# {{ ansible_managed }}
+# 'ufw' configuration file
+# /etc/ufw/ufw.conf
+
+# ###########################
+# GENERAL CONFIGURATION
+# ###########################
+
+ENABLED="{{ 'yes' if ufw_enabled else 'no' }}"
+LOGLEVEL="{{ ufw_loglevel }}"

@@ -1,0 +1,8 @@
+[Service]
+ExecStartPre=-/bin/mkdir -p /run/clamav
+ExecStartPre=/bin/chown clamav /run/clamav
+IOSchedulingPriority = {{ clamav_io_scheduling_priority }}
+CPUSchedulingPolicy = {{ clamav_cpu_scheduling_priority }}
+MemoryLimit={{ clamav_memory_limit }}
+CPUQuota={{ clamav_cpu_quota }}
+Nice = {{ clamav_niceness }}

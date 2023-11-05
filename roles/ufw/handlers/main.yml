@@ -1,0 +1,16 @@
+---
+- name: Restart Systemd daemon
+  listen: "restart systemd"
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when:
+    - not ansible_check_mode | bool
+
+- name: Restart 'Uncomplicated Firewall' systemd service
+  listen: "restart ufw"
+  ansible.builtin.systemd:
+    name: "{{ __ufw_systemd_service }}"
+    state: started
+    enabled: true
+  when:
+    - not ansible_check_mode | bool

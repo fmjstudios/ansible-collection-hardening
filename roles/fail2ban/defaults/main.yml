@@ -1,0 +1,141 @@
+---
+fail2ban_loglevel: INFO
+fail2ban_logtarget: /var/log/fail2ban.log
+
+fail2ban_ignoreself: "true"
+fail2ban_ignoreips:
+  - "127.0.0.1/8"
+  - "::1"
+
+# In seconds
+fail2ban_bantime: 600
+fail2ban_findtime: 600
+
+fail2ban_maxretry: 5
+fail2ban_destemail: root@localhost
+fail2ban_sender: root@{{ ansible_fqdn }}
+
+# JAIL configuration
+fail2ban_sshd_enabled: true
+fail2ban_sshd_port: 22
+fail2ban_sshd_log_path: /var/log/auth.log
+
+fail2ban_apache_enabled: false
+fail2ban_apache_ports: []
+
+fail2ban_traefik_enabled: false
+fail2ban_traefik_ports: []
+
+fail2ban_wordpress_enabled: false
+fail2ban_wordpress_ports: []
+
+fail2ban_grafana_enabled: false
+fail2ban_grafana_ports: []
+
+fail2ban_configuration: []
+
+fail2ban_jail_configuration: []
+# Path to directory containing filters to copy in filter.d
+# fail2ban_filterd_path:
+
+# ############################
+# EXAMPLE CONFIGURATION
+# ############################
+
+# fail2ban_loglevel: INFO
+# fail2ban_logtarget: /var/log/fail2ban.log
+
+# fail2ban_ignoreself: "true"
+# fail2ban_ignoreips: "127.0.0.1/8 ::1 147.78.126.74 87.147.95.222"
+
+# # In seconds
+# fail2ban_bantime: 600
+# fail2ban_findtime: 600
+
+# fail2ban_maxretry: 5
+# fail2ban_destemail: root@localhost
+# fail2ban_sender: root@{{ ansible_fqdn }}
+
+# # JAIL configuration
+# fail2ban_sshd_enabled: true
+# fail2ban_sshd_port: 4322
+# fail2ban_sshd_log_path: /var/log/auth.log
+
+# fail2ban_apache_enabled: true
+# fail2ban_apache_ports:
+#   - 80
+#   - 443
+
+# fail2ban_traefik_enabled: false
+# fail2ban_traefik_ports:
+#   - 80
+#   - 443
+
+# fail2ban_wordpress_enabled: false
+# fail2ban_wordpress_ports:
+#   - 80
+#   - 443
+
+# fail2ban_grafana_enabled: false
+# fail2ban_grafana_ports:
+#   - 80
+#   - 443
+
+# fail2ban_configuration:
+#   - option: loglevel
+#     value: "{{ fail2ban_loglevel }}"
+#     section: DEFAULT
+#   - option: logtarget
+#     value: "{{ fail2ban_logtarget }}"
+#     section: DEFAULT
+
+# fail2ban_jail_configuration:
+#   - option: ignoreself
+#     value: "{{ fail2ban_ignoreself }}"
+#     section: DEFAULT
+#   - option: ignoreip
+#     value: "{{ fail2ban_ignoreips }}"
+#     section: DEFAULT
+#   - option: bantime
+#     value: "{{ fail2ban_bantime }}"
+#     section: DEFAULT
+#   - option: findtime
+#     value: "{{ fail2ban_findtime }}"
+#     section: DEFAULT
+#   - option: maxretry
+#     value: "{{ fail2ban_maxretry }}"
+#     section: DEFAULT
+#   - option: destemail
+#     value: "{{ fail2ban_destemail }}"
+#     section: DEFAULT
+#   - option: sender
+#     value: "{{ fail2ban_sender }}"
+#     section: DEFAULT
+#   - option: enabled
+#     value: "{{ fail2ban_sshd_enabled }}"
+#     section: sshd
+#   - option: port
+#     value: "{{ fail2ban_sshd_port }}"
+#     section: sshd
+#   - option: filter
+#     value: "sshd"
+#     section: sshd
+#   - option: logpath
+#     value: "{{ fail2ban_sshd_log_path }}"
+#     section: sshd
+#   - option: port
+#     value: "{{ fail2ban_apache_ports | join(',') }}"
+#     section: "apache-auth"
+#     when: fail2ban_apache_enabled == true
+#   - option: port
+#     value: "{{ fail2ban_traefik_ports | join(', ') }}"
+#     section: "traefik-auth"
+#     when: fail2ban_traefik_enabled == true
+#   - option: port
+#     value: "{{ fail2ban_wordpress_ports | join(', ') }}"
+#     section: "wordpress-auth"
+#     when: fail2ban_wordpress_enabled == true
+#   - option: port
+#     value: "{{ fail2ban_grafana_ports | join(', ') }}"
+#     section: "grafana-auth"
+#     when: fail2ban_grafana_enabled == true

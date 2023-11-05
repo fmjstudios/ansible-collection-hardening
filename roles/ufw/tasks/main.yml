@@ -1,0 +1,45 @@
+---
+- name: Preflight
+  ansible.builtin.include_tasks:
+    file: preflight.yml
+    apply:
+      tags:
+        - ufw_install
+        - ufw_configure
+        - ufw_run
+  tags:
+    - ufw_install
+    - ufw_configure
+    - ufw_run
+
+- name: Install
+  ansible.builtin.include_tasks:
+    file: install.yml
+    apply:
+      become: true
+      tags:
+        - ufw_install
+  tags:
+    - ufw_install
+
+- name: Configure
+  ansible.builtin.include_tasks:
+    file: configure.yml
+    apply:
+      become: true
+      tags:
+        - ufw_configure
+  tags:
+    - ufw_configure
+
+- name: Ensure 'Uncomplicated Firewall' service is started and enabled
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ __ufw_systemd_service }}"
+    state: started
+    enabled: true
+  notify:
+    - restart systemd
+
+- name: Flush handlers after run.
+  ansible.builtin.meta: flush_handlers

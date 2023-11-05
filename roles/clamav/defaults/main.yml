@@ -1,0 +1,38 @@
+---
+clamav_io_scheduling_priority: 7
+clamav_cpu_scheduling_priority: 5
+clamav_memory_limit: 256M
+clamav_cpu_quota: 15%
+clamav_niceness: 19
+
+clamav_daemon_configuration_changes:
+  - regexp: "^.*Example$"
+    state: absent
+  - regexp: "^.*LocalSocket .*$"
+    line: "LocalSocket {{ clamav_daemon_localsocket }}"
+
+# clamav_daemon: 'clamav-daemon'
+clamav_daemon_state: started
+clamav_daemon_enabled: true
+
+# clamav_freshclam_daemon: 'clamav-freshclam'
+clamav_freshclam_daemon_state: started
+clamav_freshclam_daemon_enabled: true
+#
+# ############################
+# EXAMPLE CONFIGURATION
+# ############################
+
+# clamav_daemon_configuration_changes:
+#   - regexp: "^.*Example$"
+#     state: absent
+#   - regexp: "^.*LocalSocket .*$"
+#     line: "LocalSocket {{ clamav_daemon_localsocket }}"
+
+# # clamav_daemon: 'clamav-daemon'
+# clamav_daemon_state: started
+# clamav_daemon_enabled: true
+
+# # clamav_freshclam_daemon: 'clamav-freshclam'
+# clamav_freshclam_daemon_state: started
+# clamav_freshclam_daemon_enabled: true

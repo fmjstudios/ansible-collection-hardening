@@ -1,0 +1,103 @@
+---
+- name: configure | Create the default initialization file for 'ufw'
+  ansible.builtin.template:
+    src: ufw.sh.j2
+    dest: "{{ __ufw_default_path }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure | Create the 'ufw' main configuration file
+  ansible.builtin.template:
+    src: ufw.conf.j2
+    dest: "{{ __ufw_configuration_file_path }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure | Create the 'ufw' sysctl tunables file
+  ansible.builtin.template:
+    src: sysctl.conf.j2
+    dest: "{{ __ufw_configuration_sysctl_path }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: "'iptables' in ufw_backend"
+
+- name: configure | Create the firewall rules
+  block:
+    - name: configure | Set the general traffic policies
+      community.general.ufw:
+        rule: "{{ __ch__.rule }}"
+        protocol: any
+        interface: "{{ __ch__.interface }}"
+      loop: "{{ ufw_chains }}"
+      loop_control:
+        loop_var: __ch__
+      when: >
+        __ch__.policy is defined and
+        __ch__.policy in ['allow', 'deny', 'reject']
+
+    - name: configure | Configure the general IP-based forwarding policies
+      community.general.ufw:
+        rule: "{{ __ch__.rule }}"
+        protocol: "{{ __ch__.protocol }}"
+        interface: "{{ __ch__.interface }}"
+        src: "{{ __ch__.from_ip }}"
+        dest: "{{ __ch__.to_ip }}"
+        route: "{{ __ch__.route }}"
+        direction: "{{ __ch__.direction }}"
+        comment: "{{ __ch__.label }}"
+      loop: "{{ ufw_chains }}"
+      loop_control:
+        loop_var: __ch__
+      when: >
+        __ch__.route is defined and
+        __ch__.from_ip is defined and
+        __ch__.to_ip is defined and
+        __ch__.direction is defined and
+        __ch__.rule in ['allow', 'deny', 'reject', 'limit']
+
+    - name: configure | Configure the general port-based forwarding policies
+      community.general.ufw:
+        rule: "{{ __ch__.rule }}"
+        protocol: "{{ __ch__.protocol }}"
+        interface: "{{ __ch__.interface }}"
+        from_port: "{{ __ch__.from_port }}"
+        to_port: "{{ __ch__.to_port }}"
+        route: "{{ __ch__.route }}"
+        direction: "{{ __ch__.direction }}"
+        comment: "{{ __ch__.label }}"
+      loop: "{{ ufw_chains }}"
+      loop_control:
+        loop_var: __ch__
+      when: >
+        __ch__.route is defined and
+        __ch__.from_port is defined and
+        __ch__.to_port is defined and
+        __ch__.direction is defined and
+        __ch__.rule in ['allow', 'deny', 'reject', 'limit']
+
+    - name: configure | Configure the general traffic policies
+      community.general.ufw:
+        rule: "{{ __ch__.rule }}"
+        protocol: "{{ __ch__.protocol }}"
+        interface: "{{ __ch__.interface }}"
+        port: "{{ __ch__.port }}"
+        comment: "{{ __ch__.label }}"
+      loop: "{{ ufw_chains }}"
+      loop_control:
+        loop_var: __ch__
+      when: >
+        __ch__.port is defined and
+        __ch__.from_ip is defined and
+        __ch__.to_ip is defined and
+        __ch__.direction is defined and
+        __ch__.rule in ['allow', 'deny', 'reject', 'limit']
+
+- name: configure | Ensure restart of 'ufw' firewall
+  ansible.builtin.systemd:
+    name: "{{ __firewalld_systemd_service }}"
+    state: restarted
+  notify:
+    - restart ufw

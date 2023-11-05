@@ -1,0 +1,72 @@
+---
+- name: Import assert.yml
+  ansible.builtin.import_tasks: assert.yml
+  run_once: true
+  delegate_to: localhost
+
+- name: Install Fail2Ban
+  ansible.builtin.apt:
+    name: "{{ __fail2ban__ }}"
+    state: present
+  loop: "{{ fail2ban_packages }}"
+  loop_control:
+    loop_var: __fail2ban__
+
+- name: Copy filters into Fail2Ban's filter.d
+  ansible.builtin.copy:
+    src: "{{ fail2ban_filterd_path }}"
+    dest: /etc/fail2ban/filter.d/
+    owner: root
+    group: root
+    mode: 0640
+  when: fail2ban_filterd_path is defined
+  notify:
+    - Restart fail2ban
+
+- name: Configure Fail2Ban
+  community.general.ini_file:
+    path: /etc/fail2ban/fail2ban.local
+    section: "{{ __fail2ban__.section }}"
+    option: "{{ __fail2ban__.option }}"
+    value: "{{ __fail2ban__.value }}"
+    mode: 0640
+  loop: "{{ fail2ban_configuration }}"
+  loop_control:
+    loop_var: __fail2ban__
+    label: "{{ __fail2ban__.option }}"
+  notify:
+    - Restart fail2ban
+
+- name: Configure Fail2Ban Jail
+  community.general.ini_file:
+    path: /etc/fail2ban/jail.local
+    section: "{{ __fail2ban__.section }}"
+    option: "{{ __fail2ban__.option }}"
+    value: "{{ __fail2ban__.value }}"
+    mode: 0640
+  loop: "{{ fail2ban_jail_configuration }}"
+  loop_control:
+    loop_var: __fail2ban__
+    label: "{{ __fail2ban__.option }}"
+  notify:
+    - Restart fail2ban
+
+- name: Stat the authencation log file
+  ansible.builtin.stat:
+    path: /var/log/auth.log
+  register: fail2ban_auth
+
+- name: Create the authencation log file (if not there)
+  ansible.builtin.file:
+    path: /var/log/auth.log
+    state: touch
+    mode: 0640
+  when:
+    - fail2ban_auth.stat.exists is defined
+    - not fail2ban_auth.stat.exists
+
+- name: Start and enable Fail2Ban
+  ansible.builtin.service:
+    name: "{{ fail2ban_service }}"
+    state: started
+    enabled: yes

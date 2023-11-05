@@ -1,0 +1,17 @@
+---
+__ufw_package: ufw
+__ufw_systemd_service: "{{ __ufw_package }}"
+
+__ufw_default_path: "/etc/default/{{ __ufw_package }}"
+
+__ufw_dependencies:
+  - iptables
+  - nftables
+  - libnftables1
+
+__ufw_configuration_path: /etc/ufw
+__ufw_configuration_sysctl_path: "{{ __ufw_configuration_path }}/sysctl.conf"
+__ufw_configuration_file_path: "{{ __ufw_configuration_path }}/ufw.conf"
+
+__firewalld_package: firewalld
+__firewalld_systemd_service: "{{ __firewalld_package }}"

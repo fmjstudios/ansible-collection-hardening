@@ -1,0 +1,36 @@
+---
+- name: install | Update the system's package caches
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    update_cache_retries: 3
+    update_cache_retry_max_delay: 30
+
+- name: install | Stop other firewall clients' systemd service
+  ansible.builtin.systemd:
+    name: "{{ __firewalld_systemd_service }}"
+    state: stopped
+    enabled: false
+  when: ufw_disable_other_clients | bool
+
+- name: install | Remove other firewall clients
+  ansible.builtin.apt:
+    name: "{{ __firewalld_package }}"
+    state: absent
+    purge: true
+  when: ufw_disable_other_clients | bool
+
+- name: install | Ensure the system has all dependencies for 'ufw'
+  ansible.builtin.apt:
+    name: "{{ __dep__ }}"
+    state: present
+    install_recommends: false
+  loop: "{{ __ufw_dependencies }}"
+  loop_control:
+    loop_var: __dep__
+
+- name: install | Ensure the system has 'ufw' package installed
+  ansible.builtin.apt:
+    name: "{{ __ufw_package }}"
+    state: present
+    install-recommends: true
